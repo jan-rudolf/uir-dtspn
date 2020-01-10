@@ -13,6 +13,24 @@ from DubinsManeuver import DubinsManeuver as dubins
 
 import DTSPNSolver
 
+
+class MNodeState:
+    NOT_FOUND = 0
+    OPEN = 1
+    CLOSE = 2
+
+
+class MNode:
+    def __init__(self, point):
+        self.point = point  # te
+
+        self.parent = None
+        self.h = sys.maxsize
+        self.state = MNodeState.NOT_FOUND
+
+        self.neighbors = list()
+
+
 class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
 
     # compute the shortest sequence based on the distance matrix (self.distances)
@@ -102,7 +120,7 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
 
             m_configurations.append(new_configurations_per_goal)
 
-        m_configurations.append(m_configurations[0])  # add the first configuration as a goal
+        m_configurations.append(m_configurations[0])  # add the first configuration layer as a goal configuration layer
 
         selected_configurations = []
         for a in range(n):
