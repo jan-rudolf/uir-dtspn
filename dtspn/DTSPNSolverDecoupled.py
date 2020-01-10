@@ -35,7 +35,7 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
 
     def m_generate_radians(self, samples_count):
         """ Generate linearly radians from 0 to 2 Pi with samples_count samples."""
-        samples = np.linscace(0, 2*np.pi, num=samples_count + 1)
+        samples = np.linspace(0, 2*np.pi, num=samples_count + 1)
         return samples[:samples_count]
     
     def plan_tour(self, goals, sensing_radius, turning_radius):
@@ -81,8 +81,29 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         border_points_rads = self.m_generate_radians(number_border_points)
         border_points_angles_rads = self.m_generate_radians(number_border_points_angles)
 
-        for goal in goals:
-            pass
+        # compute configurations
+        m_configurations = []
+
+        for seq_idx in sequence:
+            new_configurations_per_goal = list()
+            goal = goals[seq_idx]
+            goal_x = goal[0]
+            goal_y = goal[1]
+
+            for border_point_rad in border_points_rads:
+                new_configuration = list()
+                new_x = goal_x + sensing_radius * np.cos(border_point_rad)
+                new_y = goal_y + sensing_radius * np.sin(border_point_rad)
+
+                for border_points_angle_rads in border_points_angles_rads:
+                    new_point = (new_x, new_y, border_points_angle_rads)
+                    new_configuration.append(new_point)
+
+                new_configurations_per_goal.append(new_configuration)
+
+            m_configurations.append(new_configurations_per_goal)
+
+        m_configurations.append(m_configurations[0])  # add the first configuration as a goal
 
         selected_configurations = []
         for a in range(n):
