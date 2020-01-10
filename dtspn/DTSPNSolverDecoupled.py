@@ -31,9 +31,9 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         sequence = read_LKHresult_cmd(fname_tsp)
         return sequence
 
-    def m_generate_angles(self, samples_count):
-        """ Generate linearly degrees from 0 to 360 with samples_count samples."""
-        samples = np.linscape(0, 360, num=samples_count + 1)
+    def m_generate_radians(self, samples_count):
+        """ Generate linearly radians from 0 to 2 Pi with samples_count samples."""
+        samples = np.linscape(0, 2*np.pi, num=samples_count + 1)
         return samples[:samples_count]
     
     def plan_tour(self, goals, sensing_radius, turning_radius):
@@ -66,7 +66,6 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         print ('TODO distances')
         self.distances = np.ones(self.distances.shape)
 
-
         sequence = self.compute_TSP_sequence()
         
         '''
@@ -77,8 +76,6 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         print ('TODO sampling')
         selected_configurations = []
         for a in range(n):
-            selected_configurations.append ( ( goals[sequence[a]][0], goals[sequence[a]][1], math.pi ) )
-
+            selected_configurations.append((goals[sequence[a]][0], goals[sequence[a]][1], math.pi))
 
         return selected_configurations
-
