@@ -6,6 +6,7 @@ import numpy as np
 import math
 from copy import deepcopy
 import matplotlib.pyplot as plt
+import heapq
 
 from scipy.spatial import distance_matrix
 
@@ -39,9 +40,49 @@ class MGraph:
 
         self.graph_nodes = graph_nodes
 
+    def _init_search(self):
+        for node in self.graph_nodes:
+            node.parent = None
+            node.h = sys.maxsize
+            self.state = MNodeState.NOT_FOUND
+
+    def _reconstruct_path(self, goal_node_idx):
+        path = list()
+        node = self.graph[len(self.graph) - 1][goal_node_idx]
+        path_cost = node.h
+        while node:
+            path.insert(0, node.data)
+            node = node.parent
+        return path, path_cost
+
     def plan(self, start_node_idx):
         """ Searchs the graph. Starts and ends in a graph node on index start_node_idx. """
-        return [], 0
+
+        self._init_search()
+
+        start_node = self.graph[0][start_node_idx]
+        start_node.h = 0
+        start_node.state = MNodeState.OPEN
+
+        m_heap = []
+        heapq.heappush(m_heap, (start_node.h, start_node))
+
+        while len(m_heap) > 0:
+            _, v = heapq.heappop(m_heap)
+            for w_idx, w in enumerate(v.neighbors):
+                if w.state == MNodeState.CLOSE:
+                    continue
+                edge_len = v.neighbors_costs[w_idx]
+                if w.h > v.h + edge_len:
+                    w.h = v.h + edge_len
+                    w.state = MNodeState.OPEN
+                    w.parent = v
+                    heapq.heappush(m_heap, (w.h, w))
+            v.state = MNodeState.CLOSE
+
+        path, path_cost = self._reconstruct_path(start_node_idx)
+
+        return path, path_cost
 
 
 class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
