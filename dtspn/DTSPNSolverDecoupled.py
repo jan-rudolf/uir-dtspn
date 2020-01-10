@@ -30,6 +30,11 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         run_LKHsolver_cmd(fname_tsp)
         sequence = read_LKHresult_cmd(fname_tsp)
         return sequence
+
+    def m_generate_angles(self, samples_count):
+        """ Generate linearly degrees from 0 to 360 with samples_count samples."""
+        samples = np.linscape(0, 360, num=samples_count + 1)
+        return samples[:samples_count]
     
     def plan_tour(self, goals, sensing_radius, turning_radius):
         """
@@ -51,7 +56,7 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         """
 
         n = len(goals)
-        self.distances = np.zeros((n,n))	
+        self.distances = np.zeros((n, n))
         self.paths = {}
 
         '''
