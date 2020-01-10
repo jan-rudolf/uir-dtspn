@@ -34,11 +34,14 @@ class MNode:
 
 
 class MGraph:
-    def __init__(self, graph):
+    def __init__(self, graph, graph_nodes):
         self.graph = graph
 
-    def search(self, start_node_idx):
-        pass
+        self.graph_nodes = graph_nodes
+
+    def plan(self, start_node_idx):
+        """ Searchs the graph. Starts and ends in a graph node on index start_node_idx. """
+        return [], 0
 
 
 class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
@@ -46,14 +49,14 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
     # compute the shortest sequence based on the distance matrix (self.distances)
     def compute_TSP_sequence(self, start_idx = None, end_idx = None):
         n = len(self.distances)
-        
+
         if start_idx != None and end_idx != None:
-            M = n * np.max(np.max(self.distances))
-            for i in range(n):
-                self.distances[i, start_idx] = M
-                self.distances[end_idx, i] = M
-            self.distances[end_idx, start_idx] = 0
-        
+           M = n * np.max(np.max(self.distances))
+           for i in range(n):
+               self.distances[i, start_idx] = M
+               self.distances[end_idx, i] = M
+           self.distances[end_idx, start_idx] = 0
+
         fname_tsp = "problem"
         user_comment = "a comment by the user"
         writeTSPLIBfile_FE(fname_tsp, self.distances,user_comment)
@@ -109,7 +112,8 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         border_points_angles_rads = self.m_generate_radians(number_border_points_angles)
 
         # compute configurations and graph nodes
-        m_configurations = []
+        m_graph = []
+        m_graph_nodes = []
 
         tmp_sequence = deepcopy(sequence)
         tmp_sequence.append(sequence[0])
@@ -126,23 +130,42 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
 
                 for border_points_angle_rads in border_points_angles_rads:
                     new_point = (new_x, new_y, border_points_angle_rads)
-                    new_configuration_level.append(MNode(new_point))
+                    new_graph_node = MNode(new_point)
 
-            m_configurations.append(new_configuration_level)
+                    m_graph_nodes.append(new_graph_node)
+
+                    new_configuration_level.append(new_graph_node)
+
+            m_graph.append(new_configuration_level)
 
         # connecting graph nodes and computing edges costs
 
-        for configuration_level_idx, configuration_level in enumerate(m_configurations):
-            if configuration_level_idx == len(m_configurations) - 1:
+        for configuration_level_idx, configuration_level in enumerate(m_graph):
+            if configuration_level_idx == len(m_graph) - 1:
                 break
             for configuration in configuration_level:
-                configuration_level_next = m_configurations[configuration_level_idx + 1]
+                configuration_level_next = m_graph[configuration_level_idx + 1]
 
                 for configuration_next in configuration_level_next:
                     edge_cost = dubins.shortest_path(configuration, configuration_next, turning_radius).get_length()
 
                     configuration.neighbors.append(configuration_next)
                     configuration.neighbors_costs.append(edge_cost)
+
+        # search in the graph
+        m_graph_planner = MGraph(m_graph, m_graph_nodes)
+
+        best_path = None
+        best_path_cost = sys.maxsize
+
+        for start_node_idx, start_node in enumerate(m_graph[0]):
+            path, path_cost = m_graph_planner.plan(start_node_idx)
+
+            if path_cost < best_path_cost:
+                best_path = path
+                best_path_cost = path_cost
+
+        print('Best path ', best_path_cost, best_path)
 
         selected_configurations = []
         for a in range(n):
