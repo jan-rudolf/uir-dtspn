@@ -33,7 +33,7 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
 
     def m_generate_radians(self, samples_count):
         """ Generate linearly radians from 0 to 2 Pi with samples_count samples."""
-        samples = np.linscape(0, 2*np.pi, num=samples_count + 1)
+        samples = np.linscace(0, 2*np.pi, num=samples_count + 1)
         return samples[:samples_count]
     
     def plan_tour(self, goals, sensing_radius, turning_radius):
@@ -58,6 +58,15 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         n = len(goals)
         self.distances = np.zeros((n, n))
         self.paths = {}
+
+        number_border_points = 8
+        number_border_points_angles = 8
+
+        border_points_radis = self.m_generate_radians(number_border_points)
+        border_points_angles_rads = self.m_generate_radians(number_border_points_angles)
+
+        for goal in goals:
+            pass
 
         '''
         TODO - homework
