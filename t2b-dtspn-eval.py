@@ -52,12 +52,12 @@ def save_figure(filename):
     #  solver type
 scenarios = [
     ("./problems/mini3.txt", 0.5, 0.5, 'DTSPN-decoupled'),
-    ("./problems/burma14.txt", 0.5, 0.5, 'DTSPN-decoupled'),
-    ("./problems/gauntlets16.txt", 0.6, 0.6, 'DTSPN-decoupled'),
-    ("./problems/att48.txt", 300, 200, 'DTSPN-decoupled'),
-    ("./problems/mini3.txt", 0.5, 0.5, 'DTSPN-NoonBean'),
-    ("./problems/burma14.txt", 0.5, 0.5, 'DTSPN-NoonBean'),
-    ("./problems/gauntlets16.txt", 0.6, 0.6, 'DTSPN-NoonBean'),
+    # ("./problems/burma14.txt", 0.5, 0.5, 'DTSPN-decoupled'),
+    # ("./problems/gauntlets16.txt", 0.6, 0.6, 'DTSPN-decoupled'),
+    # ("./problems/att48.txt", 300, 200, 'DTSPN-decoupled'),
+    # ("./problems/mini3.txt", 0.5, 0.5, 'DTSPN-NoonBean'),
+    # ("./problems/burma14.txt", 0.5, 0.5, 'DTSPN-NoonBean'),
+    # ("./problems/gauntlets16.txt", 0.6, 0.6, 'DTSPN-NoonBean'),
 ]
 
 
