@@ -6,6 +6,8 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
+from scipy.spatial import distance_matrix
+
 from invoke_LKH import *
 from DubinsManeuver import DubinsManeuver as dubins
 
@@ -59,30 +61,29 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         self.distances = np.zeros((n, n))
         self.paths = {}
 
+        '''
+        TODO - homework
+            - Compute the distance between the individual goals  
+        '''
+        self.distances = distance_matrix(goals, goals)  # np.ones(self.distances.shape)
+
+        sequence = self.compute_TSP_sequence()
+        
+        '''
+        print('TODO sampling')
+        TODO - homework
+            - Sample the configurations ih the goal areas
+            - Find the shortest tour
+        '''
         number_border_points = 8
         number_border_points_angles = 8
 
-        border_points_radis = self.m_generate_radians(number_border_points)
+        border_points_rads = self.m_generate_radians(number_border_points)
         border_points_angles_rads = self.m_generate_radians(number_border_points_angles)
 
         for goal in goals:
             pass
 
-        '''
-        TODO - homework
-            - Compute the distance between the individual goals  
-        '''
-        print ('TODO distances')
-        self.distances = np.ones(self.distances.shape)
-
-        sequence = self.compute_TSP_sequence()
-        
-        '''
-        TODO - homework
-            - Sample the configurations ih the goal areas
-            - Find the shortest tour
-        '''
-        print ('TODO sampling')
         selected_configurations = []
         for a in range(n):
             selected_configurations.append((goals[sequence[a]][0], goals[sequence[a]][1], math.pi))
