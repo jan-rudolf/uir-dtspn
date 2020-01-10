@@ -4,6 +4,7 @@ import sys
 import os
 import numpy as np
 import math
+from copy import deepcopy
 import matplotlib.pyplot as plt
 
 from scipy.spatial import distance_matrix
@@ -30,6 +31,14 @@ class MNode:
 
         self.neighbors = list()
         self.neighbors_costs = list()
+
+
+class MGraph:
+    def __init__(self, graph):
+        self.graph = graph
+
+    def search(self, start_node_idx):
+        pass
 
 
 class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
@@ -93,7 +102,7 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
             - Sample the configurations ih the goal areas
             - Find the shortest tour
         '''
-        number_border_points = 8
+        number_border_points = 15
         number_border_points_angles = 8
 
         border_points_rads = self.m_generate_radians(number_border_points)
@@ -102,26 +111,24 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         # compute configurations and graph nodes
         m_configurations = []
 
-        for seq_idx in sequence:
-            new_configurations_per_goal = list()
+        tmp_sequence = deepcopy(sequence)
+        tmp_sequence.append(sequence[0])
+
+        for seq_idx in tmp_sequence:
+            new_configuration_level = list()
             goal = goals[seq_idx]
             goal_x = goal[0]
             goal_y = goal[1]
 
             for border_point_rad in border_points_rads:
-                new_configuration = list()
                 new_x = goal_x + sensing_radius * np.cos(border_point_rad)
                 new_y = goal_y + sensing_radius * np.sin(border_point_rad)
 
                 for border_points_angle_rads in border_points_angles_rads:
                     new_point = (new_x, new_y, border_points_angle_rads)
-                    new_configuration.append(MNode(new_point))
+                    new_configuration_level.append(MNode(new_point))
 
-                new_configurations_per_goal.append(new_configuration)
-
-            m_configurations.append(new_configurations_per_goal)
-
-        m_configurations.append(m_configurations[0])  # add the first configuration layer as a goal configuration layer
+            m_configurations.append(new_configuration_level)
 
         # connecting graph nodes and computing edges costs
 
@@ -136,8 +143,6 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
 
                     configuration.neighbors.append(configuration_next)
                     configuration.neighbors_costs.append(edge_cost)
-
-
 
         selected_configurations = []
         for a in range(n):
