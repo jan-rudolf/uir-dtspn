@@ -21,14 +21,15 @@ class MNodeState:
 
 
 class MNode:
-    def __init__(self, point):
-        self.point = point  # te
+    def __init__(self, data):
+        self.data = data  # tuple (x, y, angle)
 
         self.parent = None
         self.h = sys.maxsize
         self.state = MNodeState.NOT_FOUND
 
         self.neighbors = list()
+        self.neighbors_costs = list()
 
 
 class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
@@ -98,7 +99,7 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
         border_points_rads = self.m_generate_radians(number_border_points)
         border_points_angles_rads = self.m_generate_radians(number_border_points_angles)
 
-        # compute configurations
+        # compute configurations and graph nodes
         m_configurations = []
 
         for seq_idx in sequence:
@@ -114,13 +115,29 @@ class DTSPNSolverDecoupled(DTSPNSolver.DTSPNSolver):
 
                 for border_points_angle_rads in border_points_angles_rads:
                     new_point = (new_x, new_y, border_points_angle_rads)
-                    new_configuration.append(new_point)
+                    new_configuration.append(MNode(new_point))
 
                 new_configurations_per_goal.append(new_configuration)
 
             m_configurations.append(new_configurations_per_goal)
 
         m_configurations.append(m_configurations[0])  # add the first configuration layer as a goal configuration layer
+
+        # connecting graph nodes and computing edges costs
+
+        for configuration_level_idx, configuration_level in enumerate(m_configurations):
+            if configuration_level_idx == len(m_configurations) - 1:
+                break
+            for configuration in configuration_level:
+                configuration_level_next = m_configurations[configuration_level_idx + 1]
+
+                for configuration_next in configuration_level_next:
+                    edge_cost = dubins.shortest_path(configuration, configuration_next, turning_radius).get_length()
+
+                    configuration.neighbors.append(configuration_next)
+                    configuration.neighbors_costs.append(edge_cost)
+
+
 
         selected_configurations = []
         for a in range(n):
