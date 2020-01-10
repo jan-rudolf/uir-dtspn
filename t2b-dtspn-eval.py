@@ -5,12 +5,15 @@ import sys
 import re
 import numpy as np
 import random
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, PathPatch
 
 sys.path.append('dtspn')
 sys.path.append('lkh')
 sys.path.append('gdip')
+
+matplotlib.use('TkAgg')
 
 import DTSPNSolverDecoupled as decoupled
 import DTSPNSolverNoonBean as noonbean
